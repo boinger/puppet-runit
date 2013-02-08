@@ -4,12 +4,8 @@ class runit( $ensure = present ) {
 
   if $ensure == present {
     file {
-      '/etc/sv':
-        ensure => directory,
-        ;
-      '/etc/service':
-        ensure => directory,
-        ;
+      '/etc/sv': ensure => directory;
+      '/etc/service': ensure => directory;
     }
 
   }

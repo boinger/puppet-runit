@@ -7,14 +7,13 @@ define runit::service::env( $service, $value, $ensure = present ) {
   if $ensure == present and !defined( File["/etc/sv/${service}/env"] ) {
     file{ "/etc/sv/${service}/env":
       ensure  => directory,
-      # all unmanaged envs. will be removed
       recurse => true,
-      purge   => true,
+      purge   => true, # all unmanaged envs. will be removed
     }
   }
 
   file { "${envdir}/${name}":
-    ensure => $ensure,
+    ensure  => $ensure,
     content => "${value}\n",
   }
 }

@@ -38,14 +38,22 @@ define runit::service (
   }
 
   # resource defaults
-  File { owner => root, group => root, mode => 644 }
+  File {
+    owner => root,
+    group => root,
+    mode => 0644,
+  }
 
   $svbase = "/etc/sv/${name}"
 
   # creating the logging sub-service, if requested
   if $logger == true {
     runit::service{ "${name}/log":
-      user => $user, group => $group, enable => false, ensure => $ensure, logger => false,
+      ensure  => $ensure,
+      user    => $user,
+      group   => $group,
+      enable  => false,
+      logger  => false,
       content => template('runit/logger_run.erb'),
     }
   }
@@ -56,10 +64,10 @@ define runit::service (
       ensure => $ensure ? {
         present => directory,
         default => absent,
-        },
-        purge => true,
-        force => true,
-      ;
+      },
+      purge => true,
+      force => true;
+
     "${svbase}/run":
       content => $content ? {
         undef   => template('runit/run.erb'),
@@ -67,8 +75,8 @@ define runit::service (
       },
       source  => $source,
       ensure  => $ensure,
-      mode    => 755,
-      ;
+      mode    => 0755;
+
     "${svbase}/finish":
       content => $finish_content ? {
         undef   => template('runit/finish.erb'),
@@ -76,14 +84,16 @@ define runit::service (
       },
       source  => $finish_source,
       ensure  => $ensure,
-      mode    => 755,
-      ;
+      mode    => 0755;
   }
 
   # eventually enabling/disabling the service
   if $enable == true {
     debug( "Service ${name}: ${_ensure_enabled}" )
-    runit::service::enabled { $name: ensure => $ensure, timeout => $timeout }
+    runit::service::enabled { $name:
+      ensure  => $ensure,
+      timeout => $timeout
+    }
   }
 
 }
